@@ -1,9 +1,9 @@
 "use client";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Filter, MapPin, Phone, Clock, Star } from "lucide-react";
+import { Search, MapPin, Phone, Clock, Star } from "lucide-react";
 import Link from "next/link";
-import { Navbar } from "@/components/landing/navbar";
+import Navbar from "@/components/landing/navbar";
 
 const StoresPage = () => {
   const [searchTerm, setSearchTerm] = useState("");

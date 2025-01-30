@@ -148,16 +148,4 @@ export const InlineLoader: React.FC<{ text?: string }> = ({ text }) => (
   </div>
 );
 
-// Don't forget to add these animations to your tailwind.config.js
-const tailwindConfig = {
-  theme: {
-    extend: {
-      animation: {
-        "spin-slow": "spin 3s linear infinite",
-        "spin-reverse": "spin 2s linear infinite reverse",
-      },
-    },
-  },
-};
-
 export default Loading;

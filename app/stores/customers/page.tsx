@@ -1,15 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Search,
-  Filter,
-  Mail,
-  Phone,
-  Calendar,
-  ArrowUpRight,
-} from "lucide-react";
-import { Navbar } from "@/components/landing/navbar";
+import { Search, Mail, Phone, Calendar, ArrowUpRight } from "lucide-react";
+import Navbar from "@/components/landing/navbar";
 import { Footer } from "@/components/landing/footer";
 
 const CustomersPage = () => {

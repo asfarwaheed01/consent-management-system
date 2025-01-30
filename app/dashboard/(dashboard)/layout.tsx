@@ -20,13 +20,12 @@ export default function DashboardLayout({
   const accessToken = getAccessToken();
   const { isAuthenticated, isLoading } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated && !accessToken) {
       router.replace("/");
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, router, accessToken]);
 
   if (isLoading) {
     return (

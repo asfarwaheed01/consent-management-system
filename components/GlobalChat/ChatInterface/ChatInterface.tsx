@@ -237,7 +237,7 @@ export default function ChatInterface() {
             if (data.type === "chunk") {
               setMessages((prev) =>
                 prev.map((message) =>
-                  message.id === messageId
+                  message.id.toString() === messageId // Convert message.id to string
                     ? {
                         ...message,
                         content: data.completeMessage,
@@ -299,10 +299,10 @@ export default function ChatInterface() {
 
     const timestamp = formatTimestamp(new Date());
     const userMessageId = generateId();
-    const botMessageId = generateId();
+    const botMessageId = parseInt(generateId());
 
     const userMessage: ChatMessage = {
-      id: userMessageId,
+      id: Number(userMessageId),
       role: "user",
       content: input.trim(),
       timestamp,
@@ -333,7 +333,7 @@ export default function ChatInterface() {
       }
 
       const reader = response.body.getReader();
-      await processStream(reader, botMessageId);
+      await processStream(reader, botMessageId.toString());
     } catch (error) {
       console.error("Error:", error);
       setMessages((prev) => prev.filter((msg) => msg.id !== botMessageId));

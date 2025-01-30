@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Mail, Lock, AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -15,16 +15,10 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { app } from "@/utils/firebase";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 const loginSchema = z.object({
   email: z
@@ -53,7 +47,6 @@ const LoginPage = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    setError,
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -63,7 +56,7 @@ const LoginPage = () => {
     },
   });
 
-  const { login, handleError, isAuthenticated } = useAuth();
+  const { login, handleError } = useAuth();
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
@@ -85,7 +78,7 @@ const LoginPage = () => {
         description: "Successfully logged in with Google!",
       });
       console.log("The Response is", result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       handleError(error);
     }
   };

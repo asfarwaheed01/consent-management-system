@@ -15,7 +15,7 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 
 // validation schema
@@ -99,24 +99,24 @@ const SignupPage = () => {
         // Redirect to dashboard after successful signup
         router.push("/dashboard");
       }
-    } catch (error: any) {
-      // Handle different types of errors
-      if (error.response) {
-        // Server responded with an error
+    } catch (error: unknown) {
+      // Check if error is an AxiosError
+      if (error instanceof AxiosError && error.response) {
         const errorData = error.response.data;
 
         // Handle specific field errors
-        if (typeof errorData === "object") {
+        if (typeof errorData === "object" && errorData !== null) {
           Object.keys(errorData).forEach((key) => {
             setError(key as keyof SignupFormValues, {
               type: "manual",
               message: Array.isArray(errorData[key])
                 ? errorData[key][0]
-                : errorData[key],
+                : (errorData[key] as string),
             });
           });
         }
 
+        // Show error toast
         toast({
           title: "Error",
           description:
@@ -124,8 +124,8 @@ const SignupPage = () => {
           variant: "destructive",
           duration: 5000,
         });
-      } else if (error.request) {
-        // Network error
+      } else if (error instanceof AxiosError && error.request) {
+        // Handle network error
         toast({
           title: "Network Error",
           description:
@@ -133,8 +133,17 @@ const SignupPage = () => {
           variant: "destructive",
           duration: 5000,
         });
+      } else if (error instanceof Error) {
+        // Handle other errors
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred. Please try again later.",
+          variant: "destructive",
+          duration: 5000,
+        });
       } else {
-        // Other errors
+        // Handle unknown errors
+        console.error("Unknown error:", error);
         toast({
           title: "Error",
           description: "An unexpected error occurred. Please try again later.",
@@ -142,7 +151,6 @@ const SignupPage = () => {
           duration: 5000,
         });
       }
-      console.error("Signup error:", error);
     }
   };
 

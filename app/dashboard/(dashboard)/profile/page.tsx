@@ -12,6 +12,15 @@ import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
+interface UserData {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  username: string;
+  date_joined: string;
+  // Add other fields as needed
+}
 // Schema for form validation
 const profileSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
@@ -26,7 +35,8 @@ const ProfilePage = () => {
   const [isClient, setIsClient] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [userData, setUserData] = useState<any>(null);
+
+  const [userData, setUserData] = useState<UserData | null>(null);
   const { handleError, handleSuccess } = useAuth();
 
   const {

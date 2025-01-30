@@ -43,7 +43,7 @@ export interface SearchResult {
   data: any;
 }
 
-export type ArtifactType = "code" | "search" | "visualization";
+export type ArtifactType = "code" | "search" | "visualization" | "text";
 
 export interface Artifact {
   id: string;

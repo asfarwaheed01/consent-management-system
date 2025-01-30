@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,30 +54,35 @@ const CreateAgentChat = () => {
   const [responses, setResponses] = useState<Record<string, string>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const questions: QuestionType[] = [
-    {
-      id: "name",
-      content: "What would you like to name your AI agent?",
-      inputType: "text",
-    },
-    {
-      id: "purpose",
-      content: "What's the main purpose of this agent?",
-      inputType: "text",
-    },
-    {
-      id: "knowledge",
-      content: "Select a knowledge base for your agent:",
-      inputType: "select",
-      options: SAMPLE_KNOWLEDGE_BASES,
-    },
-    {
-      id: "prompt",
-      content: "Choose a base personality template:",
-      inputType: "select",
-      options: SAMPLE_PROMPTS,
-    },
-  ];
+  console.log(responses);
+
+  const questions: QuestionType[] = useMemo(
+    () => [
+      {
+        id: "name",
+        content: "What would you like to name your AI agent?",
+        inputType: "text",
+      },
+      {
+        id: "purpose",
+        content: "What's the main purpose of this agent?",
+        inputType: "text",
+      },
+      {
+        id: "knowledge",
+        content: "Select a knowledge base for your agent:",
+        inputType: "select",
+        options: SAMPLE_KNOWLEDGE_BASES,
+      },
+      {
+        id: "prompt",
+        content: "Choose a base personality template:",
+        inputType: "select",
+        options: SAMPLE_PROMPTS,
+      },
+    ],
+    [] // Add dependencies here if needed
+  );
 
   const addBotMessage = (question: QuestionType) => {
     setMessages((prev) => [
@@ -113,7 +118,7 @@ const CreateAgentChat = () => {
       addBotMessage(questions[0]);
     }
     scrollToBottom();
-  }, [messages, showChat]);
+  }, [messages, showChat, questions]);
 
   const handleQuestionResponse = (questionId: string, response: string) => {
     setResponses((prev) => ({

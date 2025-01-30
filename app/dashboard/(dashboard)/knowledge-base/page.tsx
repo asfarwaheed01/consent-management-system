@@ -8,7 +8,6 @@ import {
   Search,
   FileText,
   Files,
-  Users,
   HelpCircle,
   Book,
   GraduationCap,

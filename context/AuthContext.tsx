@@ -203,7 +203,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     dispatch({ type: "UPDATE_USER", payload: userData });
   }, []);
 
-  // Token refresh function
   const refreshTokens = async () => {
     try {
       const refreshToken = state.tokens?.refresh;
@@ -220,7 +219,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       );
 
       const { access } = response.data;
-      dispatch({ type: "SET_TOKENS", payload: { ...state.tokens, access } });
+
+      // Ensure `refresh` is non-optional
+      dispatch({
+        type: "SET_TOKENS",
+        payload: { access, refresh: refreshToken },
+      });
+
       localStorage.setItem(
         "tokens",
         JSON.stringify({ ...state.tokens, access })

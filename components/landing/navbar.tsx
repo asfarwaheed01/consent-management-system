@@ -1,222 +1,228 @@
-"use client";
-
-import * as React from "react";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu";
-import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
-import { useState } from "react";
-import { ThemeToggle } from "../themetoggle/theme-toggle";
+  ChevronDown,
+  Menu,
+  X,
+  Layout,
+  Users,
+  BarChart,
+  Settings,
+  Bell,
+  Search,
+} from "lucide-react";
+import Link from "next/link";
 
-const components: { title: string; href: string; description: string }[] = [
-  {
-    title: "Chat AI",
-    href: "/products/chat",
-    description:
-      "Advanced AI chatbot for natural conversations and assistance.",
-  },
-  {
-    title: "Image Generation",
-    href: "/products/image",
-    description: "Create stunning images with our AI-powered generator.",
-  },
-  {
-    title: "Code Assistant",
-    href: "/products/code",
-    description: "Get help with coding and development tasks.",
-  },
-];
-
-interface ListItemProps extends React.HTMLAttributes<HTMLAnchorElement> {
-  title: string;
-  href: string;
-}
-
-const ListItem = React.forwardRef<HTMLAnchorElement, ListItemProps>(
-  ({ className, title, children, href, ...props }, ref) => {
-    return (
-      <li>
-        <NavigationMenuLink asChild>
-          <Link ref={ref} href={href} className={cn("", className)} {...props}>
-            <div className="text-sm font-medium leading-none text-black">
-              {title}
-            </div>
-            <p className="line-clamp-2 text-sm leading-snug text-gray-500">
-              {children}
-            </p>
-          </Link>
-        </NavigationMenuLink>
-      </li>
-    );
-  }
-);
-ListItem.displayName = "ListItem";
-
-export function Navbar() {
+const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const menuItems = [
+    {
+      title: "Products",
+      dropdown: [
+        { title: "Store Management", icon: <Layout className="w-5 h-5" /> },
+        { title: "Customer Analytics", icon: <Users className="w-5 h-5" /> },
+        { title: "Reports & Insights", icon: <BarChart className="w-5 h-5" /> },
+      ],
+    },
+    {
+      title: "Solutions",
+      dropdown: [
+        { title: "Enterprise", icon: <Settings className="w-5 h-5" /> },
+        { title: "Small Business", icon: <Layout className="w-5 h-5" /> },
+        { title: "Startups", icon: <Users className="w-5 h-5" /> },
+      ],
+    },
+    { title: "Pricing" },
+    { title: "Resources" },
+  ];
 
   return (
-    <header className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          <Link href="/" className="font-bold text-2xl text-black">
-            AI Platform
-          </Link>
+    <motion.nav
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      className={`fixed w-full z-50 transition-all duration-300 ${
+        isScrolled ? "bg-white shadow-lg" : "bg-transparent"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo */}
+          <motion.div whileHover={{ scale: 1.05 }} className="flex-shrink-0">
+            <Link href="/" className="flex items-center">
+              <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-xl">C</span>
+              </div>
+              <span className="ml-2 text-xl font-bold text-blue-900">
+                Consent.io
+              </span>
+            </Link>
+          </motion.div>
+
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center space-x-8">
+            {menuItems.map((item, index) => (
+              <div
+                key={index}
+                className="relative"
+                onMouseEnter={() =>
+                  //@ts-expect-error This condition checks if the item has a dropdown before activating it
+                  setActiveDropdown(item.dropdown ? index : null)
+                }
+                onMouseLeave={() => setActiveDropdown(null)}
+              >
+                <motion.button
+                  whileHover={{ y: -2 }}
+                  className="flex items-center space-x-1 text-gray-600 hover:text-blue-500"
+                >
+                  <span>{item.title}</span>
+                  {item.dropdown && <ChevronDown className="w-4 h-4" />}
+                </motion.button>
+
+                {/* Dropdown Menu */}
+                <AnimatePresence>
+                  {item.dropdown && activeDropdown === index && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute left-0 mt-2 w-60 bg-white rounded-xl shadow-lg py-2 border border-blue-100"
+                    >
+                      {item.dropdown.map((dropItem, idx) => (
+                        <motion.a
+                          key={idx}
+                          href="#"
+                          whileHover={{ x: 5, backgroundColor: "#F3F4F6" }}
+                          className="flex items-center px-4 py-3 text-gray-600 hover:text-blue-500"
+                        >
+                          {dropItem.icon}
+                          <span className="ml-3">{dropItem.title}</span>
+                        </motion.a>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Right Menu */}
+          <div className="hidden md:flex items-center space-x-6">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              className="p-2 text-gray-600 hover:text-blue-500"
+            >
+              <Search className="w-5 h-5" />
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              className="p-2 text-gray-600 hover:text-blue-500 relative"
+            >
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              Get Started
+            </motion.button>
+          </div>
 
           {/* Mobile Menu Button */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="md:hidden p-2 text-gray-600 hover:text-blue-500"
             onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden text-black"
           >
-            <Menu className="h-6 w-6" />
-          </button>
-
-          {/* Desktop Navigation */}
-          <div className="hidden lg:block">
-            <NavigationMenu>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className=" text-black dark:text-white">
-                    Products
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2">
-                      {components.map((component) => (
-                        <ListItem
-                          key={component.title}
-                          title={component.title}
-                          href={component.href}
-                        >
-                          {component.description}
-                        </ListItem>
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link href="/pricing" legacyBehavior passHref>
-                    <NavigationMenuLink
-                      className={cn(
-                        navigationMenuTriggerStyle(),
-                        "text-black dark:text-white"
-                      )}
-                    >
-                      Pricing
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link href="/about" legacyBehavior passHref>
-                    <NavigationMenuLink
-                      className={cn(
-                        navigationMenuTriggerStyle(),
-                        "text-black dark:text-white"
-                      )}
-                    >
-                      About
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link href="/stores" legacyBehavior passHref>
-                    <NavigationMenuLink
-                      className={cn(
-                        navigationMenuTriggerStyle(),
-                        "text-black dark:text-white"
-                      )}
-                    >
-                      Stores
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link href="/stores/customers" legacyBehavior passHref>
-                    <NavigationMenuLink
-                      className={cn(
-                        navigationMenuTriggerStyle(),
-                        "text-black dark:text-white"
-                      )}
-                    >
-                      Customers
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
-          </div>
-
-          {/* Desktop Buttons */}
-          <div className="hidden lg:flex items-center gap-4">
-            <ThemeToggle />
-            <Link href="/login">
-              <Button
-                variant="ghost"
-                className="text-black hover:bg-gray-100 border-black"
-              >
-                Login
-              </Button>
-            </Link>
-            <Link href="/signup">
-              <Button className="bg-black text-white hover:bg-gray-800">
-                Sign Up
-              </Button>
-            </Link>
-          </div>
-
-          {/* Mobile Menu */}
-          {isOpen && (
-            <div className="lg:hidden absolute top-16 left-0 right-0 bg-white border-b">
-              <div className="flex flex-col p-4 space-y-4">
-                <Link
-                  href="/products"
-                  className="text-black hover:text-gray-600"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Products
-                </Link>
-                <Link
-                  href="/pricing"
-                  className="text-black hover:text-gray-600"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Pricing
-                </Link>
-                <Link
-                  href="/about"
-                  className="text-black hover:text-gray-600"
-                  onClick={() => setIsOpen(false)}
-                >
-                  About
-                </Link>
-                <div className="flex flex-col gap-2 pt-4 border-t">
-                  <Link href="/login">
-                    <Button
-                      variant="ghost"
-                      className="w-full text-black border-black"
-                    >
-                      Login
-                    </Button>
-                  </Link>
-                  <Link href="/dashboard">
-                    <Button className="w-full bg-black text-white hover:bg-gray-800">
-                      Get Started
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          )}
+            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </motion.button>
         </div>
       </div>
-    </header>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden bg-white border-t"
+          >
+            <div className="px-4 py-2 space-y-1">
+              {menuItems.map((item, index) => (
+                <div key={index}>
+                  <motion.button
+                    whileHover={{ x: 5 }}
+                    className="w-full text-left px-4 py-3 text-gray-600 hover:text-blue-500 flex items-center justify-between"
+                    onClick={() =>
+                      //@ts-expect-error This toggles the dropdown visibility in the mobile menu based on its current state
+                      setActiveDropdown(activeDropdown === index ? null : index)
+                    }
+                  >
+                    <span>{item.title}</span>
+                    {item.dropdown && (
+                      <ChevronDown
+                        className={`w-4 h-4 transform transition-transform ${
+                          activeDropdown === index ? "rotate-180" : ""
+                        }`}
+                      />
+                    )}
+                  </motion.button>
+
+                  {/* Mobile Dropdown */}
+                  <AnimatePresence>
+                    {item.dropdown && activeDropdown === index && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="bg-gray-50 px-4 py-2"
+                      >
+                        {item.dropdown.map((dropItem, idx) => (
+                          <motion.a
+                            key={idx}
+                            href="#"
+                            whileHover={{ x: 5 }}
+                            className="flex items-center px-4 py-3 text-gray-600 hover:text-blue-500"
+                          >
+                            {dropItem.icon}
+                            <span className="ml-3">{dropItem.title}</span>
+                          </motion.a>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ))}
+
+              <div className="px-4 py-4 border-t border-gray-200">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  className="w-full bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  Get Started
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.nav>
   );
-}
+};
+
+export default Navbar;
